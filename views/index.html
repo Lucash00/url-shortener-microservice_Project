@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html>
   <head>
     <title>URL Shortener Microservice | freeCodeCamp.org</title>
@@ -15,7 +14,7 @@
     <h1>URL Shortener Microservice</h1>
     <main>
       <section>
-        <form action="api/shorturl" method="POST">
+        <form id="url-form" action="/api/shorturl" method="POST">
           <fieldset>
             <legend>URL Shortener</legend>
             <label for="url_input">URL:</label>
@@ -24,9 +23,45 @@
           </fieldset>
         </form>
       </section>
+
+      <section id="result" style="display: none;">
+        <h2>Shortened URL</h2>
+        <p>Original URL: <span id="original-url"></span></p>
+        <p>Short URL: <a href="" target="_blank" id="short-url"></a></p>
+      </section>
     </main>
+
     <footer>
       <p>By <a href="https://www.freecodecamp.org/">freeCodeCamp</a></p>
     </footer>
+
+    <script>
+      const form = document.getElementById("url-form");
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        const url = document.getElementById("url_input").value;
+        
+        const response = await fetch('/api/shorturl', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ url })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          alert(data.error);
+        } else {
+          document.getElementById("result").style.display = 'block';
+          document.getElementById("original-url").innerText = data.original_url;
+          const shortUrl = window.location.origin + '/api/shorturl/' + data.short_url;
+          document.getElementById("short-url").href = shortUrl;
+          document.getElementById("short-url").innerText = shortUrl;
+        }
+      });
+    </script>
   </body>
 </html>
