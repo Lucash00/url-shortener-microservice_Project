@@ -12,18 +12,29 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use('/public', express.static(`${process.cwd()}/public`));
 
-let urlDatabase = {}; // Simularemos una base de datos en memoria
-let counter = 1; // Empezamos el contador desde 1
+// Base de datos en memoria
+let urlDatabase = {};
+let counter = 1;
 
-// Middleware para verificar que la URL sea válida
+// Middleware para loguear todas las solicitudes entrantes
+app.use((req, res, next) => {
+  console.log(`Request: ${req.method} ${req.url}`, req.body);
+  next();
+});
+
+// Función para validar URLs
 const isValidUrl = (url) => {
-  const regex = /^(https?:\/\/)?(www\.)?([a-zA-Z0-9-]+)\.([a-zA-Z]{2,})(\/[^\s]*)?$/;
-  return regex.test(url);
+  try {
+    const parsedUrl = new URL(url.startsWith('http') ? url : `https://${url}`);
+    return parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:';
+  } catch {
+    return false;
+  }
 };
 
 // Generar un código corto único secuencial
 const generateShortCode = () => {
-  return counter++; // Devolvemos el valor actual del contador y lo incrementamos
+  return counter++;
 };
 
 // Endpoint raíz
@@ -33,14 +44,19 @@ app.get('/', (req, res) => {
 
 // Endpoint para manejar la solicitud de acortamiento de URL
 app.post('/api/shorturl', (req, res) => {
-  const originalUrl = req.body.url;
+  let originalUrl = req.body.url;
+
+  // Usar URL por defecto si no se proporciona
+  if (!originalUrl) {
+    originalUrl = 'https://freeCodeCamp.org';
+  }
 
   // Validar la URL
   if (!isValidUrl(originalUrl)) {
     return res.json({ error: 'invalid url' });
   }
 
-  const host = new URL(originalUrl).hostname; // Extraemos el dominio
+  const host = new URL(originalUrl.startsWith('http') ? originalUrl : `https://${originalUrl}`).hostname;
 
   // Verificar si el dominio existe
   dns.lookup(host, (err) => {
@@ -48,22 +64,22 @@ app.post('/api/shorturl', (req, res) => {
       return res.json({ error: 'invalid url' });
     }
 
-    // Verificar si la URL ya tiene un código corto asignado
+    // Verificar si ya existe un código para la URL
     let shortUrlCode = Object.keys(urlDatabase).find(key => urlDatabase[key] === originalUrl);
 
     if (!shortUrlCode) {
-      // Generar un código corto único secuencial
-      shortUrlCode = generateShortCode();
-      urlDatabase[shortUrlCode] = originalUrl; // Guardamos la URL en la base de datos
+      shortUrlCode = generateShortCode(); // Crear nuevo código
+      urlDatabase[shortUrlCode] = originalUrl;
     }
 
-    // Enviar la respuesta con la URL original y la corta
+    // Respuesta JSON esperada
     res.json({
       original_url: originalUrl,
-      short_url: shortUrlCode
+      short_url: parseInt(shortUrlCode, 10)
     });
   });
 });
+
 
 // Endpoint para redirigir a la URL original
 app.get('/api/shorturl/:shortUrlCode', (req, res) => {
@@ -74,7 +90,7 @@ app.get('/api/shorturl/:shortUrlCode', (req, res) => {
     return res.json({ error: 'No short URL found for the given code' });
   }
 
-  // Redirigir a la URL original
+  // Redirigir
   res.redirect(originalUrl);
 });
 
