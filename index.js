@@ -13,6 +13,7 @@ app.use(express.json());
 app.use('/public', express.static(`${process.cwd()}/public`));
 
 let urlDatabase = {}; // Simularemos una base de datos en memoria
+let counter = 1; // Empezamos el contador desde 1
 
 // Middleware para verificar que la URL sea válida
 const isValidUrl = (url) => {
@@ -20,11 +21,9 @@ const isValidUrl = (url) => {
   return regex.test(url);
 };
 
-// Generar un código corto único con números aleatorios
+// Generar un código corto único secuencial
 const generateShortCode = () => {
-  // Generar un número aleatorio de 7 dígitos
-  const shortCode = Math.floor(Math.random() * 10000000); // Número aleatorio de 7 dígitos
-  return shortCode;
+  return counter++; // Devolvemos el valor actual del contador y lo incrementamos
 };
 
 // Endpoint raíz
@@ -49,7 +48,7 @@ app.post('/api/shorturl', (req, res) => {
       return res.json({ error: 'invalid url' });
     }
 
-    // Generar un código corto único
+    // Generar un código corto único secuencial
     const shortUrlCode = generateShortCode();
     urlDatabase[shortUrlCode] = originalUrl; // Guardamos la URL en la base de datos
 
