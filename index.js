@@ -48,9 +48,14 @@ app.post('/api/shorturl', (req, res) => {
       return res.json({ error: 'invalid url' });
     }
 
-    // Generar un código corto único secuencial
-    const shortUrlCode = generateShortCode();
-    urlDatabase[shortUrlCode] = originalUrl; // Guardamos la URL en la base de datos
+    // Verificar si la URL ya tiene un código corto asignado
+    let shortUrlCode = Object.keys(urlDatabase).find(key => urlDatabase[key] === originalUrl);
+
+    if (!shortUrlCode) {
+      // Generar un código corto único secuencial
+      shortUrlCode = generateShortCode();
+      urlDatabase[shortUrlCode] = originalUrl; // Guardamos la URL en la base de datos
+    }
 
     // Enviar la respuesta con la URL original y la corta
     res.json({
