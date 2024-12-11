@@ -1,16 +1,19 @@
 {
-  "name": "shorturl",
-  "version": "0.0.3",
-  "description": "API project for freeCodeCamp",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js"
-  },
   "dependencies": {
-    "body-parser": "^1.19.0",
+    "body-parser": "^1.20.3",
     "cors": "^2.8.5",
-    "dotenv": "^8.2.0",
-    "express": "^4.17.1"
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
   },
-  "license": "MIT"
+  "name": "boilerplate-project-urlshortener",
+  "version": "1.0.0",
+  "description": "This is the boilerplate code for the URL Shortener Microservice project. Instructions for building your project can be found at https://www.freecodecamp.org/learn/back-end-development-and-apis/back-end-development-and-apis-projects/url-shortener-microservice.",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Lucas Moreno",
+  "license": "ISC"
 }
