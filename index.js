@@ -20,13 +20,10 @@ const isValidUrl = (url) => {
   return regex.test(url);
 };
 
-// Generar un código corto único
+// Generar un código corto único con números aleatorios
 const generateShortCode = () => {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let shortCode = '';
-  for (let i = 0; i < 7; i++) {
-    shortCode += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
+  // Generar un número aleatorio de 7 dígitos
+  const shortCode = Math.floor(Math.random() * 10000000); // Número aleatorio de 7 dígitos
   return shortCode;
 };
 
@@ -63,7 +60,6 @@ app.post('/api/shorturl', (req, res) => {
     });
   });
 });
-
 
 // Endpoint para redirigir a la URL original
 app.get('/api/shorturl/:shortUrlCode', (req, res) => {
